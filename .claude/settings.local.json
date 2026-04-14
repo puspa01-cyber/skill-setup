@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.goldbelly.com)",
+      "WebFetch(domain:www.pizzeriavetri.com)"
+    ]
+  }
+}

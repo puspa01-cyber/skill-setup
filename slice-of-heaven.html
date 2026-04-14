@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slice-Of-Heaven — Wood-Fired Pizza</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blue: {
+              50:'#F0F4FA',100:'#DCE6F5',200:'#B8CCE8',300:'#8BAFDA',
+              400:'#6B9AD0',500:'#4A80BF',600:'#3466A3',700:'#264D7A',
+            },
+            pink: {
+              50:'#FDF2F4',100:'#FAE0E6',200:'#F5C2CF',300:'#EDA0B4',
+              400:'#E47D99',500:'#D45C7E',600:'#B8406A',
+            },
+            warm: {
+              50:'#FFFCF9',100:'#FFF7F0',200:'#FFEEDD',
+              DEFAULT:'#FFF9F4',
+            },
+            sand: '#F5EDE4',
+            charcoal: '#2C2A28',
+          },
+          fontFamily: {
+            display: ['DM Serif Display', 'Georgia', 'serif'],
+            script: ['Caveat', 'cursive'],
+            body: ['DM Sans', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft-sm': '0 2px 8px rgba(44,42,40,0.06)',
+            'soft-md': '0 8px 24px rgba(44,42,40,0.08)',
+            'soft-lg': '0 18px 48px rgba(44,42,40,0.1)',
+            'pink': '0 10px 30px rgba(212,92,126,0.2)',
+            'blue': '0 10px 30px rgba(74,128,191,0.2)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+      --ease-std: cubic-bezier(0.4,0,0.2,1);
+      --dur: 550ms;
+    }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #FFF9F4;
+      color: #2C2A28;
+    }
+
+    /* Reveals */
+    .reveal {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity var(--dur) var(--ease-std), transform var(--dur) var(--ease-spring);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-scale {
+      opacity: 0; transform: scale(0.9);
+      transition: opacity var(--dur) var(--ease-std), transform var(--dur) var(--ease-spring);
+    }
+    .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+    .stagger-1{transition-delay:100ms}.stagger-2{transition-delay:200ms}
+    .stagger-3{transition-delay:300ms}.stagger-4{transition-delay:400ms}
+    .stagger-5{transition-delay:500ms}.stagger-6{transition-delay:600ms}
+
+    @keyframes float {
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-12px) rotate(1.5deg)}
+    }
+    @keyframes gentle-pulse {
+      0%,100%{opacity:0.5;transform:scale(1)}
+      50%{opacity:0.8;transform:scale(1.05)}
+    }
+    .float{animation:float 5s ease-in-out infinite}
+    .gentle-pulse{animation:gentle-pulse 4s ease-in-out infinite}
+
+    /* Navbar */
+    .nav-scrolled {
+      background:rgba(255,249,244,0.9)!important;
+      backdrop-filter:blur(14px);
+      box-shadow:0 1px 8px rgba(44,42,40,0.06);
+      border-bottom:1px solid #F5EDE4;
+    }
+
+    /* Underline links */
+    .link-underline{position:relative}
+    .link-underline::after{
+      content:'';position:absolute;bottom:-3px;left:0;width:100%;height:2px;
+      background:linear-gradient(90deg,#6B9AD0,#E47D99);
+      transform:scaleX(0);transform-origin:left;
+      transition:transform 300ms cubic-bezier(0,0,0.2,1);
+    }
+    .link-underline:hover::after{transform:scaleX(1)}
+
+    /* Card hover */
+    .card-hover{
+      transition:transform 400ms var(--ease-spring),box-shadow 400ms var(--ease-std),border-color 300ms;
+    }
+    .card-hover:hover{
+      transform:translateY(-6px);
+      box-shadow:0 18px 48px rgba(44,42,40,0.1);
+      border-color:#E47D99;
+    }
+
+    /* Buttons */
+    .btn-pink{
+      transition:transform 200ms var(--ease-spring),box-shadow 200ms var(--ease-std),background 150ms;
+    }
+    .btn-pink:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 30px rgba(212,92,126,0.25);
+      background:#E47D99;
+    }
+    .btn-pink:active{transform:translateY(0) scale(0.97)}
+
+    .btn-outline{transition:all 200ms var(--ease-spring)}
+    .btn-outline:hover{
+      background:#2C2A28;color:#FFF9F4;transform:translateY(-2px);
+    }
+
+    /* Eyebrow */
+    .eyebrow::before{
+      content:'';display:inline-block;width:32px;height:2px;
+      background:linear-gradient(90deg,#6B9AD0,#E47D99);
+      margin-right:10px;vertical-align:middle;border-radius:1px;
+    }
+
+    /* Reduced motion */
+    @media(prefers-reduced-motion:reduce){
+      .reveal,.reveal-scale{opacity:1;transform:none;transition:none}
+      .float,.gentle-pulse{animation:none}
+      .card-hover:hover{transform:none}
+      .btn-pink:hover,.btn-outline:hover{transform:none}
+      *{transition-duration:0.01ms!important;animation-duration:0.01ms!important}
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+
+  <!-- ======== NAVBAR ======== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style="background:transparent">
+    <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2 L4 28 L28 28 Z" fill="#E47D99" opacity="0.8"/>
+          <circle cx="12" cy="20" r="2.5" fill="#6B9AD0" opacity="0.6"/>
+          <circle cx="20" cy="22" r="2" fill="#6B9AD0" opacity="0.6"/>
+          <circle cx="16" cy="15" r="2" fill="#E47D99" opacity="0.5"/>
+        </svg>
+        <span class="font-display text-xl text-charcoal">Slice-Of-Heaven</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#about" class="font-body font-medium text-sm text-charcoal/70 link-underline hover:text-charcoal">About</a>
+        <a href="#menu" class="font-body font-medium text-sm text-charcoal/70 link-underline hover:text-charcoal">Menu</a>
+        <a href="#reviews" class="font-body font-medium text-sm text-charcoal/70 link-underline hover:text-charcoal">Reviews</a>
+        <a href="#visit" class="font-body font-medium text-sm text-charcoal/70 link-underline hover:text-charcoal">Visit</a>
+        <a href="#visit" class="btn-pink inline-flex items-center gap-2 bg-pink-500 text-white font-body font-bold text-sm px-6 py-2.5 rounded-full shadow-pink">
+          Order Now
+        </a>
+      </div>
+
+      <button id="mobile-toggle" class="md:hidden text-charcoal p-2" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-warm border-t border-sand px-6 pb-6">
+      <div class="flex flex-col gap-4 pt-4">
+        <a href="#about" class="font-body font-medium text-charcoal/70 py-2">About</a>
+        <a href="#menu" class="font-body font-medium text-charcoal/70 py-2">Menu</a>
+        <a href="#reviews" class="font-body font-medium text-charcoal/70 py-2">Reviews</a>
+        <a href="#visit" class="font-body font-medium text-charcoal/70 py-2">Visit</a>
+        <a href="#visit" class="btn-pink inline-flex items-center justify-center bg-pink-500 text-white font-body font-bold text-sm px-6 py-2.5 rounded-full shadow-pink mt-2">Order Now</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======== HERO ======== -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <!-- Hero background image -->
+    <div class="absolute inset-0">
+      <img src="https://goldbelly.imgix.net/uploads/merchant/main_image/596/lou-malnatis-pizzeria.a832606eb51a7b7f0e48f9475529f28a.jpg?ixlib=rails-3.1.0&fit=crop&w=1920&h=1080" alt="Wood-fired pizza" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-b from-warm/80 via-warm/60 to-warm/90"></div>
+    </div>
+
+    <!-- Soft decorative blobs -->
+    <div class="absolute top-20 left-8 md:left-16 w-64 h-64 bg-blue-200/15 rounded-full blur-3xl gentle-pulse"></div>
+    <div class="absolute bottom-20 right-8 md:right-16 w-72 h-72 bg-pink-200/15 rounded-full blur-3xl gentle-pulse" style="animation-delay:-2s"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <h1 class="reveal font-display italic text-charcoal leading-[0.95] tracking-tight" style="font-size:clamp(3rem,8vw,6rem)">
+        Slice-Of-Heaven
+      </h1>
+
+      <p class="reveal stagger-1 font-script font-bold mt-3 -rotate-2 inline-block bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent" style="font-size:clamp(1.3rem,2.5vw,2rem)">
+        Wood-fired. Hand-tossed. Heavenly.
+      </p>
+
+      <p class="reveal stagger-2 font-body text-charcoal/60 text-lg max-w-lg mx-auto mt-6 leading-relaxed">
+        Artisan pizza baked in our 900&deg;F wood-burning oven with locally sourced ingredients. Every pie made from scratch, every time.
+      </p>
+
+      <div class="reveal stagger-3 flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+        <a href="#menu" class="btn-pink inline-flex items-center gap-2 bg-pink-500 text-white font-body font-bold px-8 py-4 rounded-full shadow-pink text-base">
+          View Our Menu
+        </a>
+        <a href="#visit" class="btn-outline inline-flex items-center gap-2 border-2 border-charcoal/30 text-charcoal font-body font-bold px-8 py-4 rounded-full text-base bg-white/40 backdrop-blur-sm">
+          Order for Pickup
+        </a>
+      </div>
+
+      <div class="reveal stagger-4 mt-16 md:mt-20">
+        <div class="flex flex-col items-center gap-2 text-charcoal/30">
+          <span class="font-body text-xs uppercase tracking-[0.14em] font-medium">Scroll to explore</span>
+          <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== ABOUT ======== -->
+  <section id="about" class="py-24 md:py-36 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="reveal eyebrow font-body font-medium uppercase text-xs tracking-[0.14em] text-charcoal/40">Our Story</span>
+        <h2 class="reveal stagger-1 font-display text-charcoal mt-4" style="font-size:clamp(2rem,4vw,3rem);line-height:1.1">
+          Crafted with Passion, Baked with Fire
+        </h2>
+        <p class="reveal stagger-2 font-body text-charcoal/50 text-lg mt-4 max-w-xl mx-auto">
+          Since 2018, we've been perfecting the art of wood-fired pizza with 72-hour cold-fermented dough and the finest ingredients.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="reveal stagger-1 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-blue-400" viewBox="0 0 28 28" fill="currentColor">
+              <path d="M14 2C14 2 6 8 6 16C6 20.4 9.6 24 14 24C18.4 24 22 20.4 22 16C22 8 14 2 14 2Z"/>
+            </svg>
+          </div>
+          <h3 class="font-display text-xl text-charcoal mb-3">Wood-Fired at 900&deg;F</h3>
+          <p class="font-body text-charcoal/50 leading-relaxed">Our Neapolitan hearth cooks each pizza in 90 seconds, creating the perfect leopard-spotted char.</p>
+        </div>
+
+        <div class="reveal stagger-2 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-pink-400" viewBox="0 0 28 28" fill="currentColor">
+              <circle cx="14" cy="14" r="12"/>
+            </svg>
+          </div>
+          <h3 class="font-display text-xl text-charcoal mb-3">72-Hour Dough</h3>
+          <p class="font-body text-charcoal/50 leading-relaxed">Cold-fermented with Caputo 00 flour, sea salt, water, and wild yeast. No shortcuts, incredible flavor.</p>
+        </div>
+
+        <div class="reveal stagger-3 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-blue-400" viewBox="0 0 28 28" fill="currentColor">
+              <path d="M14 2C14 2 4 10 8 20C10 24 14 26 14 26C14 26 18 24 20 20C24 10 14 2 14 2Z"/>
+            </svg>
+          </div>
+          <h3 class="font-display text-xl text-charcoal mb-3">Locally Sourced</h3>
+          <p class="font-body text-charcoal/50 leading-relaxed">Farm-fresh produce from Central Valley growers, hand-pulled mozzarella made daily, seasonal ingredients.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== MENU ======== -->
+  <section id="menu" class="py-24 md:py-36 px-6 bg-gradient-to-b from-blue-50/40 to-pink-50/30">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="reveal eyebrow font-body font-medium uppercase text-xs tracking-[0.14em] text-charcoal/40">The Menu</span>
+        <h2 class="reveal stagger-1 font-display text-charcoal mt-4" style="font-size:clamp(2rem,4vw,3rem);line-height:1.1">
+          Our Signature Pies
+        </h2>
+        <p class="reveal stagger-2 font-body text-charcoal/50 text-lg mt-4 max-w-xl mx-auto">
+          Hand-stretched to order, baked in our wood-fired oven. Served uncut, Neapolitan style.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Featured -->
+        <div class="reveal stagger-1 card-hover bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-[32px] p-10 shadow-pink relative overflow-hidden md:row-span-2">
+          <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <span class="inline-flex items-center gap-2 bg-white/20 font-body font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5.5l-4.3 3.2 1.6 5.3L8 11.3 3.2 14.5l1.6-5.3L.5 6h5.5z"/></svg>
+            Chef's Pick
+          </span>
+          <h3 class="font-display text-3xl mb-3">The Diavola</h3>
+          <p class="font-body text-white/75 leading-relaxed mb-8">San Marzano tomato sauce, fior di latte, spicy soppressata, Calabrian chili oil, and fresh basil.</p>
+          <div class="flex items-end justify-between">
+            <span class="font-display text-4xl">$19</span>
+            <span class="font-script text-white/70 text-xl rotate-2">Bestseller!</span>
+          </div>
+        </div>
+
+        <!-- Margherita -->
+        <div class="reveal stagger-2 card-hover bg-white border border-sand rounded-3xl p-7 shadow-soft-sm">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-display text-xl text-charcoal">Margherita D.O.C.</h3>
+            <span class="font-display text-pink-500 text-xl font-bold">$16</span>
+          </div>
+          <p class="font-body text-charcoal/45 leading-relaxed text-sm">San Marzano tomatoes, buffalo mozzarella, fresh basil, extra-virgin olive oil.</p>
+        </div>
+
+        <!-- Wild Mushroom -->
+        <div class="reveal stagger-3 card-hover bg-white border border-sand rounded-3xl p-7 shadow-soft-sm">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-display text-xl text-charcoal">Wild Mushroom</h3>
+            <span class="font-display text-pink-500 text-xl font-bold">$18</span>
+          </div>
+          <p class="font-body text-charcoal/45 leading-relaxed text-sm">Cremini, oyster, and shiitake mushrooms, fontina, truffle cream, thyme.</p>
+        </div>
+
+        <!-- Prosciutto -->
+        <div class="reveal stagger-4 card-hover bg-white border border-sand rounded-3xl p-7 shadow-soft-sm">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-display text-xl text-charcoal">Prosciutto & Arugula</h3>
+            <span class="font-display text-pink-500 text-xl font-bold">$20</span>
+          </div>
+          <p class="font-body text-charcoal/45 leading-relaxed text-sm">Prosciutto di Parma, wild arugula, shaved Parmigiano, lemon vinaigrette.</p>
+        </div>
+
+        <!-- Sausage -->
+        <div class="reveal stagger-5 card-hover bg-white border border-sand rounded-3xl p-7 shadow-soft-sm">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-display text-xl text-charcoal">Sausage & Peppers</h3>
+            <span class="font-display text-pink-500 text-xl font-bold">$18</span>
+          </div>
+          <p class="font-body text-charcoal/45 leading-relaxed text-sm">House-made fennel sausage, roasted peppers, caramelized onions, provolone.</p>
+        </div>
+
+        <!-- Bianca -->
+        <div class="reveal stagger-6 card-hover bg-white border border-sand rounded-3xl p-7 shadow-soft-sm md:col-span-2">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-display text-xl text-charcoal">The Bianca</h3>
+            <span class="font-display text-pink-500 text-xl font-bold">$17</span>
+          </div>
+          <p class="font-body text-charcoal/45 leading-relaxed text-sm">No sauce — ricotta, mozzarella, garlic confit, pecorino, and a drizzle of local honey.</p>
+        </div>
+      </div>
+
+      <!-- Starters -->
+      <div class="mt-14">
+        <h3 class="reveal font-display text-2xl text-charcoal mb-8 text-center">Starters & Sides</h3>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="reveal stagger-1 card-hover bg-white border border-sand rounded-2xl p-5 shadow-soft-sm text-center">
+            <h4 class="font-display text-lg text-charcoal mb-1">Burrata</h4>
+            <p class="font-body text-charcoal/35 text-xs mb-2">Heirloom tomatoes, basil oil, bread</p>
+            <span class="font-display font-bold text-blue-400">$14</span>
+          </div>
+          <div class="reveal stagger-2 card-hover bg-white border border-sand rounded-2xl p-5 shadow-soft-sm text-center">
+            <h4 class="font-display text-lg text-charcoal mb-1">Caesar</h4>
+            <p class="font-body text-charcoal/35 text-xs mb-2">Little gems, anchovy, croutons, pecorino</p>
+            <span class="font-display font-bold text-blue-400">$12</span>
+          </div>
+          <div class="reveal stagger-3 card-hover bg-white border border-sand rounded-2xl p-5 shadow-soft-sm text-center">
+            <h4 class="font-display text-lg text-charcoal mb-1">Garlic Knots</h4>
+            <p class="font-body text-charcoal/35 text-xs mb-2">Garlic butter, parsley, parmesan</p>
+            <span class="font-display font-bold text-blue-400">$8</span>
+          </div>
+          <div class="reveal stagger-4 card-hover bg-white border border-sand rounded-2xl p-5 shadow-soft-sm text-center">
+            <h4 class="font-display text-lg text-charcoal mb-1">Meatballs</h4>
+            <p class="font-body text-charcoal/35 text-xs mb-2">Sunday gravy, ricotta, crusty bread</p>
+            <span class="font-display font-bold text-blue-400">$13</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== REVIEWS ======== -->
+  <section id="reviews" class="py-24 md:py-36 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="reveal eyebrow font-body font-medium uppercase text-xs tracking-[0.14em] text-charcoal/40">Reviews</span>
+        <h2 class="reveal stagger-1 font-display text-charcoal mt-4" style="font-size:clamp(2rem,4vw,3rem);line-height:1.1">
+          Loved by Our Neighbors
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-7">
+        <div class="reveal stagger-1 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+          </div>
+          <p class="font-body text-charcoal/65 leading-relaxed mb-6">"Best pizza in Fresno, hands down. The Diavola has the perfect kick and the crust is unlike anything else in town. We come every Friday."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
+              <span class="font-body font-bold text-xs text-pink-500">MR</span>
+            </div>
+            <div>
+              <p class="font-body font-bold text-sm text-charcoal">Maria R.</p>
+              <p class="font-body text-xs text-charcoal/35">Google Review</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal stagger-2 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+          </div>
+          <p class="font-body text-charcoal/65 leading-relaxed mb-6">"Brought my family from the Bay Area and they couldn't believe this was in Fresno. The burrata starter alone is worth the trip."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
+              <span class="font-body font-bold text-xs text-blue-500">JT</span>
+            </div>
+            <div>
+              <p class="font-body font-bold text-sm text-charcoal">James T.</p>
+              <p class="font-body text-xs text-charcoal/35">Yelp Review</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal stagger-3 card-hover bg-white border border-sand rounded-3xl p-8 shadow-soft-sm">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+            <svg class="w-4.5 h-4.5 text-sand" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5H19l-5.3 4 2 6.5L10 14l-5.7 4 2-6.5L1 7.5h6.5z"/></svg>
+          </div>
+          <p class="font-body text-charcoal/65 leading-relaxed mb-6">"The Bianca with honey is a revelation. Only giving 4 stars because the Saturday wait can be brutal — but honestly, it's worth it."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-pink-50 flex items-center justify-center">
+              <span class="font-body font-bold text-xs text-pink-400">SK</span>
+            </div>
+            <div>
+              <p class="font-body font-bold text-sm text-charcoal">Sarah K.</p>
+              <p class="font-body text-xs text-charcoal/35">Google Review</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== VISIT US ======== -->
+  <section id="visit" class="py-24 md:py-36 px-6 bg-gradient-to-b from-pink-50/30 to-blue-50/30">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div>
+          <span class="reveal eyebrow font-body font-medium uppercase text-xs tracking-[0.14em] text-charcoal/40">Find Us</span>
+          <h2 class="reveal stagger-1 font-display text-charcoal mt-4 mb-8" style="font-size:clamp(2rem,4vw,3rem);line-height:1.1">
+            Come Hungry,<br>Leave Happy
+          </h2>
+
+          <div class="space-y-6">
+            <div class="reveal stagger-2 flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 4 6 4 10c0 6 8 12 8 12s8-6 8-12c0-4-4-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <p class="font-body font-bold text-charcoal text-sm">Location</p>
+                <p class="font-body text-charcoal/45 text-sm">1847 Fulton Street, Fresno, CA 93721</p>
+              </div>
+            </div>
+
+            <div class="reveal stagger-3 flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <div>
+                <p class="font-body font-bold text-charcoal text-sm">Hours</p>
+                <p class="font-body text-charcoal/45 text-sm">
+                  Tue&ndash;Thu: 4&ndash;10pm &middot; Fri&ndash;Sat: 4&ndash;11pm<br>
+                  Sun: 3&ndash;9pm &middot; <span class="text-charcoal/30">Closed Mon</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="reveal stagger-4 flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92V19a2 2 0 01-2.18 2A19.86 19.86 0 013 5.18 2 2 0 015 3h2.09a2 2 0 012 1.72c.12.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 10.9a16 16 0 006.07 6.07l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.58 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <div>
+                <p class="font-body font-bold text-charcoal text-sm">Reservations</p>
+                <p class="font-body text-charcoal/45 text-sm">(559) 555-7437 &middot; Walk-ins welcome</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal stagger-5 mt-10 flex flex-col sm:flex-row gap-4">
+            <a href="#" class="btn-pink inline-flex items-center justify-center bg-pink-500 text-white font-body font-bold px-8 py-4 rounded-full shadow-pink">
+              Order Online
+            </a>
+            <a href="#" class="btn-outline inline-flex items-center justify-center border-2 border-charcoal/15 text-charcoal font-body font-bold px-8 py-4 rounded-full bg-transparent">
+              Make a Reservation
+            </a>
+          </div>
+        </div>
+
+        <!-- Illustration -->
+        <div class="reveal reveal-scale stagger-2">
+          <div class="relative">
+            <svg class="w-full max-w-sm mx-auto float" viewBox="0 0 280 280" fill="none">
+              <!-- Wooden board -->
+              <ellipse cx="140" cy="160" rx="120" ry="16" fill="#D4A84B" opacity="0.15"/>
+              <!-- Whole pizza -->
+              <circle cx="140" cy="130" r="100" fill="#F0D89A" opacity="0.6"/>
+              <circle cx="140" cy="130" r="95" fill="#E5C060" opacity="0.4"/>
+              <!-- Sauce -->
+              <circle cx="140" cy="130" r="82" fill="#E47D99" opacity="0.3"/>
+              <!-- Cheese -->
+              <circle cx="115" cy="105" r="16" fill="white" opacity="0.35"/>
+              <circle cx="160" cy="98" r="14" fill="white" opacity="0.3"/>
+              <circle cx="130" cy="145" r="18" fill="white" opacity="0.35"/>
+              <circle cx="168" cy="138" r="13" fill="white" opacity="0.3"/>
+              <circle cx="108" cy="140" r="12" fill="white" opacity="0.32"/>
+              <circle cx="152" cy="118" r="15" fill="white" opacity="0.35"/>
+              <!-- Toppings -->
+              <circle cx="120" cy="112" r="7" fill="#D45C7E" opacity="0.5"/>
+              <circle cx="158" cy="104" r="6" fill="#D45C7E" opacity="0.5"/>
+              <circle cx="138" cy="155" r="7" fill="#D45C7E" opacity="0.5"/>
+              <circle cx="172" cy="130" r="6" fill="#D45C7E" opacity="0.5"/>
+              <circle cx="110" cy="138" r="6.5" fill="#D45C7E" opacity="0.5"/>
+              <circle cx="148" cy="88" r="6" fill="#D45C7E" opacity="0.5"/>
+              <!-- Basil -->
+              <ellipse cx="132" cy="124" rx="5" ry="3" fill="#6B9AD0" opacity="0.4" transform="rotate(-30 132 124)"/>
+              <ellipse cx="162" cy="150" rx="5" ry="3" fill="#6B9AD0" opacity="0.35" transform="rotate(20 162 150)"/>
+              <!-- Steam wisps -->
+              <path d="M125 38 Q120 22 125 10" stroke="#E47D99" stroke-width="1.5" opacity="0.12" fill="none" stroke-linecap="round"/>
+              <path d="M140 32 Q135 14 140 2" stroke="#6B9AD0" stroke-width="1.5" opacity="0.1" fill="none" stroke-linecap="round"/>
+              <path d="M155 36 Q160 20 155 8" stroke="#E47D99" stroke-width="1.5" opacity="0.08" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FOOTER ======== -->
+  <footer class="bg-charcoal text-white py-14 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="reveal grid md:grid-cols-3 gap-10 mb-10">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-6 h-6" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2 L4 28 L28 28 Z" fill="#E47D99" opacity="0.8"/>
+              <circle cx="12" cy="20" r="2" fill="#6B9AD0" opacity="0.6"/>
+              <circle cx="20" cy="22" r="1.5" fill="#6B9AD0" opacity="0.6"/>
+            </svg>
+            <span class="font-display text-lg text-white">Slice-Of-Heaven</span>
+          </div>
+          <p class="font-body text-white/35 text-sm leading-relaxed max-w-xs">Wood-fired pizza with locally sourced ingredients. Baked in our 900&deg;F hearth since 2018.</p>
+        </div>
+
+        <div>
+          <h4 class="font-body font-bold text-xs uppercase tracking-[0.14em] text-pink-400 mb-4">Links</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#about" class="font-body text-sm text-white/40 hover:text-pink-400 transition-colors">Our Story</a></li>
+            <li><a href="#menu" class="font-body text-sm text-white/40 hover:text-pink-400 transition-colors">Menu</a></li>
+            <li><a href="#reviews" class="font-body text-sm text-white/40 hover:text-pink-400 transition-colors">Reviews</a></li>
+            <li><a href="#visit" class="font-body text-sm text-white/40 hover:text-pink-400 transition-colors">Visit Us</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-body font-bold text-xs uppercase tracking-[0.14em] text-blue-400 mb-4">Follow Along</h4>
+          <div class="flex gap-3">
+            <a href="#" class="w-9 h-9 rounded-full bg-white/8 flex items-center justify-center hover:bg-pink-500 text-white/40 hover:text-white transition-all duration-200" aria-label="Instagram">
+              <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href="#" class="w-9 h-9 rounded-full bg-white/8 flex items-center justify-center hover:bg-blue-500 text-white/40 hover:text-white transition-all duration-200" aria-label="Facebook">
+              <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="#" class="w-9 h-9 rounded-full bg-white/8 flex items-center justify-center hover:bg-pink-500 text-white/40 hover:text-white transition-all duration-200" aria-label="Yelp">
+              <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.18L19 9v6l-7 3.88L5 15V9l7-4.82z"/></svg>
+            </a>
+          </div>
+          <p class="font-body text-white/20 text-xs mt-5">@sliceofheavenfresno</p>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 pt-7 flex flex-col md:flex-row items-center justify-between gap-3">
+        <p class="font-body text-white/20 text-xs">&copy; 2026 Slice-Of-Heaven. All rights reserved.</p>
+        <p class="font-script text-pink-400/30 text-sm">Made with love &hearts;</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======== JS ======== -->
+  <script>
+    const navbar=document.getElementById('navbar');
+    window.addEventListener('scroll',()=>navbar.classList.toggle('nav-scrolled',window.scrollY>60));
+
+    const toggle=document.getElementById('mobile-toggle'),menu=document.getElementById('mobile-menu');
+    toggle.addEventListener('click',()=>menu.classList.toggle('hidden'));
+    menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.add('hidden')));
+
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+    },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal,.reveal-scale').forEach(el=>obs.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click',function(e){
+        e.preventDefault();
+        const t=document.querySelector(this.getAttribute('href'));
+        if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+  </script>
+</body>
+</html>
